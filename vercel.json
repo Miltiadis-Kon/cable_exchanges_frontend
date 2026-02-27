@@ -11,7 +11,7 @@
     "crons": [
         {
             "path": "/api/cron/fetch-kafka",
-            "schedule": "0 6,9,12,15 * * *"
+            "schedule": "0 15 * * *"
         }
     ]
 }
