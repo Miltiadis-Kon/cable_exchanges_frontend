@@ -12,6 +12,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call Vercel Cron Endpoint
-        run: |
-          curl -X GET "https://${{ secrets.VERCEL_PROJECT_URL }}/api/cron/fetch-kafka" \
-               -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+        run: >
+          curl -sSf -X GET "https://${{ secrets.VERCEL_PROJECT_URL }}/api/cron/fetch-kafka" -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
