@@ -1,0 +1,17 @@
+name: Trigger Vercel Kafka Fetch
+
+on:
+  schedule:
+    # Run at 06:00, 09:00, 12:00, and 15:00 UTC every day
+    - cron: '0 6,9,12,15 * * *'
+  # Allow manual triggering from the GitHub Actions UI
+  workflow_dispatch:
+
+jobs:
+  ping-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call Vercel Cron Endpoint
+        run: |
+          curl -X GET "https://${{ secrets.VERCEL_PROJECT_URL }}/api/cron/fetch-kafka" \
+               -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
