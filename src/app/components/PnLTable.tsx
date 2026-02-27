@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Download, ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { Download, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 
@@ -30,16 +30,11 @@ const generatePnLData = (date: Date): PnLData[] => {
       MEAL: random(100, 550, hour, 7),
       MEBA: random(60, 290, hour, 8),
     };
-    // Calculate TOTAL
-    data.TOTAL = Object.keys(data)
-      .filter(key => key !== 'time' && key !== 'TOTAL')
-      .reduce((sum, key) => sum + (data[key] as number), 0);
-    data.TOTAL = Number(data.TOTAL.toFixed(1));
     return data;
   });
 };
 
-const borders = ['ALGR', 'ALME', 'BAHR', 'BAME', 'GRAL', 'GRMK', 'GRTR', 'HRBA', 'MEAL', 'MEBA', 'TOTAL'];
+const borders = ['ALGR', 'ALME', 'BAHR', 'BAME', 'GRAL', 'GRMK', 'GRTR', 'HRBA', 'MEAL', 'MEBA'];
 
 type SortDirection = 'asc' | 'desc' | null;
 
@@ -51,7 +46,7 @@ export function PnLTable({ date }: PnLTableProps) {
   const [searchText, setSearchText] = useState('');
   const [sortColumn, setSortColumn] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<SortDirection>(null);
-  
+
   const pnlData = generatePnLData(date);
 
   const handleSort = (column: string) => {
@@ -108,7 +103,7 @@ export function PnLTable({ date }: PnLTableProps) {
       ...borders.map(border => row[border])
     ]);
     const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
-    
+
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -117,12 +112,6 @@ export function PnLTable({ date }: PnLTableProps) {
     a.click();
     window.URL.revokeObjectURL(url);
   };
-
-  // Calculate statistics
-  const totalPnL = pnlData.reduce((sum, row) => sum + (row.TOTAL as number), 0);
-  const avgPnL = totalPnL / pnlData.length;
-  const maxPnL = Math.max(...pnlData.map(row => row.TOTAL as number));
-  const minPnL = Math.min(...pnlData.map(row => row.TOTAL as number));
 
   const getSortIcon = (column: string) => {
     if (sortColumn !== column) return <ArrowUpDown className="w-4 h-4 text-gray-400" />;
@@ -146,46 +135,6 @@ export function PnLTable({ date }: PnLTableProps) {
           </Button>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-4">
-          <div className="bg-white rounded-lg p-4 border shadow-sm">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-wide">Total PnL</p>
-                <p className={`text-2xl font-bold mt-1 ${totalPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  {totalPnL >= 0 ? '+' : ''}{totalPnL.toFixed(0)}
-                </p>
-              </div>
-              {totalPnL >= 0 ? (
-                <TrendingUp className="w-8 h-8 text-green-500" />
-              ) : (
-                <TrendingDown className="w-8 h-8 text-red-500" />
-              )}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg p-4 border shadow-sm">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Average PnL</p>
-            <p className={`text-2xl font-bold mt-1 ${avgPnL >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              {avgPnL >= 0 ? '+' : ''}{avgPnL.toFixed(0)}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg p-4 border shadow-sm">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Max PnL</p>
-            <p className="text-2xl font-bold text-green-600 mt-1">
-              +{maxPnL.toFixed(0)}
-            </p>
-          </div>
-
-          <div className="bg-white rounded-lg p-4 border shadow-sm">
-            <p className="text-xs text-gray-500 uppercase tracking-wide">Min PnL</p>
-            <p className="text-2xl font-bold text-red-600 mt-1">
-              {minPnL.toFixed(0)}
-            </p>
-          </div>
-        </div>
-
         <Input
           type="text"
           placeholder="Search by time period (e.g., 08, 14-15)..."
@@ -203,11 +152,10 @@ export function PnLTable({ date }: PnLTableProps) {
                 Time
               </th>
               {borders.map((border) => (
-                <th 
-                  key={border} 
-                  className={`px-4 py-3 text-center text-sm font-semibold border-r cursor-pointer hover:bg-gray-100 transition-colors min-w-[90px] ${
-                    border === 'TOTAL' ? 'bg-blue-100' : 'text-gray-700'
-                  }`}
+                <th
+                  key={border}
+                  className={`px-4 py-3 text-center text-sm font-semibold border-r cursor-pointer hover:bg-gray-100 transition-colors min-w-[90px] ${border === 'TOTAL' ? 'bg-blue-100' : 'text-gray-700'
+                    }`}
                   onClick={() => handleSort(border)}
                 >
                   <div className="flex items-center justify-center gap-1">
@@ -227,11 +175,10 @@ export function PnLTable({ date }: PnLTableProps) {
                 {borders.map((border) => {
                   const value = row[border] as number;
                   return (
-                    <td 
-                      key={border} 
-                      className={`px-4 py-3 text-center text-sm border-r ${getCellColor(value)} ${
-                        border === 'TOTAL' ? 'font-semibold bg-blue-50' : ''
-                      }`}
+                    <td
+                      key={border}
+                      className={`px-4 py-3 text-center text-sm border-r ${getCellColor(value)} ${border === 'TOTAL' ? 'font-semibold bg-blue-50' : ''
+                        }`}
                     >
                       {value >= 0 ? '+' : ''}{value.toFixed(1)}
                     </td>
@@ -240,26 +187,6 @@ export function PnLTable({ date }: PnLTableProps) {
               </tr>
             ))}
           </tbody>
-          <tfoot>
-            <tr className="bg-gray-100 font-semibold border-t-2">
-              <td className="px-4 py-4 border-r sticky left-0 bg-gray-100 z-10 text-gray-900">
-                Total
-              </td>
-              {borders.map((border) => {
-                const total = pnlData.reduce((sum, row) => sum + (row[border] as number), 0);
-                return (
-                  <td 
-                    key={border} 
-                    className={`px-4 py-4 text-center border-r ${getCellColor(total)} ${
-                      border === 'TOTAL' ? 'font-bold bg-blue-100' : ''
-                    }`}
-                  >
-                    {total >= 0 ? '+' : ''}{total.toFixed(1)}
-                  </td>
-                );
-              })}
-            </tr>
-          </tfoot>
         </table>
       </div>
 
