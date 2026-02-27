@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "dev": "vite",
+    "vercel-dev": "vercel dev"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
+    "@vercel/kv": "^3.0.0",
+    "kafkajs": "^2.2.4",
     "@mui/icons-material": "7.3.5",
     "@mui/material": "7.3.5",
     "@popperjs/core": "2.11.8",

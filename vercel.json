@@ -1,0 +1,17 @@
+{
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "framework": "vite",
+    "rewrites": [
+        {
+            "source": "/((?!api).*)",
+            "destination": "/index.html"
+        }
+    ],
+    "crons": [
+        {
+            "path": "/api/cron/fetch-kafka",
+            "schedule": "0 6,9,12,15 * * *"
+        }
+    ]
+}
